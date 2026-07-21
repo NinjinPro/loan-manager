@@ -1,0 +1,12 @@
+__pycache__
+venv
+*.db
+*.sqlite
+*.md
+dbg.py
+.gitignorer
+.clonerignore
+.git
+.env
+instance
+trash

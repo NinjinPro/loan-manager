@@ -1,18 +1,19 @@
-# routes/people.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from crud.person import PersonCRUD
-from models.person import PersonType
+from crud.transaction import TransactionCRUD
 
 people_bp = Blueprint("people", __name__, url_prefix="/people")
 person_crud = PersonCRUD()
+transaction_crud = TransactionCRUD()
 
 @people_bp.route("/")
 @login_required
 def list_people():
-    creditors = person_crud.get_creditors(current_user.id)
-    debtors = person_crud.get_debtors(current_user.id)
-    return render_template("people/list.html", creditors=creditors, debtors=debtors)
+    people = person_crud.get_by_user(current_user.id)
+    for p in people:
+        p.balance = transaction_crud.get_person_balance(p.id)
+    return render_template("people/list.html", people=people)
 
 @people_bp.route("/add", methods=["GET", "POST"])
 @login_required
@@ -20,16 +21,14 @@ def add_person():
     if request.method == "POST":
         name = request.form["name"]
         phone = request.form.get("phone")
-        ptype = request.form["type"]
         notes = request.form.get("notes")
         person_crud.create(
             user_id=current_user.id,
             name=name,
             phone=phone,
-            type=PersonType(ptype),
             notes=notes
         )
-        flash(f"{ptype.capitalize()} '{name}' added.", "success")
+        flash(f"Person '{name}' added.", "success")
         return redirect(url_for("people.list_people"))
     return render_template("people/form.html", person=None)
 
@@ -40,24 +39,13 @@ def person_detail(id):
     if not person or person.user_id != current_user.id:
         flash("Person not found.", "danger")
         return redirect(url_for("people.list_people"))
-
-    # Get all transactions for this person
-    from crud.transaction import TransactionCRUD
-    transaction_crud = TransactionCRUD()
+    balance = transaction_crud.get_person_balance(person.id)
     transactions = transaction_crud.filter_by(person_id=person.id, user_id=current_user.id)
-
-    # Compute totals
-    total_pending = sum(t.total_due or 0 for t in transactions if not t.is_paid)
-    total_paid = sum(t.total_due or 0 for t in transactions if t.is_paid)
-    total_all = total_pending + total_paid
-
     return render_template(
         "people/detail.html",
         person=person,
-        transactions=transactions,
-        total_pending=total_pending,
-        total_paid=total_paid,
-        total_all=total_all
+        balance=balance,
+        transactions=transactions
     )
 
 @people_bp.route("/<int:id>/edit", methods=["GET", "POST"])
@@ -70,15 +58,8 @@ def edit_person(id):
     if request.method == "POST":
         name = request.form["name"]
         phone = request.form.get("phone")
-        ptype = request.form["type"]
         notes = request.form.get("notes")
-        person_crud.update(
-            id,
-            name=name,
-            phone=phone,
-            type=PersonType(ptype),
-            notes=notes
-        )
+        person_crud.update(id, name=name, phone=phone, notes=notes)
         flash(f"'{name}' updated.", "success")
         return redirect(url_for("people.list_people"))
     return render_template("people/form.html", person=person)

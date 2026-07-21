@@ -1,23 +1,25 @@
 // static/js/utils.js
 
-/**
- * AJAX helper – send JSON or form data.
- * @param {string} url
- * @param {object} options - { method, data, headers, type ('json'|'form') }
- * @returns {Promise}
- */
 async function apiRequest(url, options = {}) {
     const {
         method = 'GET',
         data = null,
         headers = {},
-        type = 'json'   // 'json' or 'form'
+        type = 'json'
     } = options;
 
     const fetchOptions = {
         method,
         headers: { ...headers },
     };
+
+    // Add CSRF token for non‑GET requests
+    if (method !== 'GET') {
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        if (csrfMeta) {
+            fetchOptions.headers['X-CSRFToken'] = csrfMeta.getAttribute('content');
+        }
+    }
 
     if (data) {
         if (type === 'json') {
@@ -40,9 +42,6 @@ async function apiRequest(url, options = {}) {
     return response.text();
 }
 
-/**
- * Format a number to Rwandan Franc string, e.g. 150000 → "150,000 Rwf"
- */
 function formatRwf(amount) {
     if (amount == null) return '';
     return Number(amount).toLocaleString('en-RW', {
@@ -50,7 +49,7 @@ function formatRwf(amount) {
     }) + ' Rwf';
 }
 
-/* ---- Colour conversion helpers for ThemeManager ---- */
+/* ---- Colour conversion helpers (unchanged) ---- */
 function hexToRgb(hex) {
     hex = hex.replace('#', '');
     const r = parseInt(hex.substring(0, 2), 16);
@@ -65,7 +64,7 @@ function rgbToHsl(r, g, b) {
     let h, s, l = (max + min) / 2;
 
     if (max === min) {
-        h = s = 0; // achromatic
+        h = s = 0;
     } else {
         const d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -96,9 +95,11 @@ function handleOfflineForm(form, endpoint, method = 'POST') {
         e.preventDefault();
         loading.show();
         const formData = Object.fromEntries(new FormData(form));
+        // Remove csrf_token from the data – it will be sent via header
+        delete formData.csrf_token;
         try {
             await window.syncManager.submitForm(formData, endpoint, method);
-            window.location.href = form.dataset.redirect || '/'; // redirect after success
+            window.location.href = form.dataset.redirect || '/';
         } catch (err) {
             alert('Error: ' + err.message);
         } finally {
@@ -107,9 +108,9 @@ function handleOfflineForm(form, endpoint, method = 'POST') {
     });
 }
 
-// Expose to global scope (non-module)
 window.apiRequest = apiRequest;
 window.formatRwf = formatRwf;
 window.hexToRgb = hexToRgb;
 window.rgbToHsl = rgbToHsl;
 window.hslToHex = hslToHex;
+window.handleOfflineForm = handleOfflineForm;

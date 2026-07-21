@@ -2,13 +2,12 @@
 {% block title %}Transactions{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 style="color: var(--theme-70);">Transactions{% if person %} with {{ person.name }}{% endif %}</h2>
+    <h2 style="color: var(--theme-70);"><i class="bi bi-cash-stack me-2"></i>Transactions{% if person %} with {{ person.name }}{% endif %}</h2>
     <a href="{{ url_for('transactions.add_transaction') }}{% if person %}?person_id={{ person.id }}{% endif %}" class="btn btn-primary" style="background-color: var(--theme-75); border-color: var(--theme-70);">
         <i class="bi bi-plus-circle me-1"></i> New Transaction
     </a>
 </div>
 
-<!-- Filters -->
 <form class="row g-2 mb-3" method="GET">
     <div class="col-md-3">
         <select name="status" class="form-select">
@@ -27,8 +26,8 @@
         <thead>
             <tr>
                 <th>Person</th>
+                <th>Direction</th>
                 <th>Amount</th>
-                <th>Interest</th>
                 <th>Total Due</th>
                 <th>Status</th>
                 <th>Date</th>
@@ -39,13 +38,18 @@
             {% for t in transactions %}
             <tr>
                 <td>
-                	<a href="{{ url_for('people.person_detail', id=t.person.id) }}" class="text-decoration-none" style="color: var(--theme-80);">
-        				{{ t.person.name }}
-    				</a>
+                    <a href="{{ url_for('people.person_detail', id=t.person.id) }}" class="text-decoration-none" style="color: var(--theme-80);">
+                        <i class="bi bi-person-circle me-1"></i>{{ t.person.name }}
+                    </a>
                 </td>
-                
+                <td>
+                    {% if t.direction.value == 'money_out' %}
+                        <span class="badge bg-danger">You paid</span>
+                    {% else %}
+                        <span class="badge bg-success">They paid</span>
+                    {% endif %}
+                </td>
                 <td>{{ t.amount | rwf }}</td>
-                <td>{{ (t.interest_amount or 0) | rwf }}</td>
                 <td>{{ (t.total_due or 0) | rwf }}</td>
                 <td>
                     <span class="badge {{ 'bg-success' if t.is_paid else 'bg-warning text-dark' }}">
@@ -59,30 +63,27 @@
                             Actions
                         </button>
                         <ul class="dropdown-menu">
-                        	<li>
-                            	<a href="{{ url_for('transactions.detail', id=t.id) }}" class="btn-me btn-outline btn btn-sm">
-    								<i class="bi bi-eye-fill"></i> View
-								</a>
-							</li>
-                            
                             <li>
-                            	<a href="{{ url_for('transactions.edit_transaction', id=t.id) }}" class="btn-me btn-outline-primary btn btn-sm">
-                            		<i class="bi bi-pencil-square"></i> Edit
-                            	</a>
+                                <a href="{{ url_for('transactions.detail', id=t.id) }}" class="btn-me btn-outline btn btn-sm">
+                                    <i class="bi bi-eye-fill"></i> View
+                                </a>
                             </li>
-                            
                             <li>
-                            	<a href="#" onclick="deleteTransaction({{ t.id }})" class="btn-me btn btn-sm btn-outline-danger">
-    								<i class="bi bi-trash3-fill"></i> Delete
-								</a>
+                                <a href="{{ url_for('transactions.edit_transaction', id=t.id) }}" class="btn-me btn-outline-primary btn btn-sm">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
                             </li>
-                            
+                            <li>
+                                <a href="#" onclick="deleteTransaction({{ t.id }})" class="btn-me btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash3-fill"></i> Delete
+                                </a>
+                            </li>
                             {% if not t.is_paid %}
-                            	<li>
-                                	<a href="{{ url_for('transactions.mark_paid', id=t.id) }}" class="btn btn-sm btn-me btn-outline-success text-success">
-                                		Mark Paid
-                                    </a>
-                                </li>
+                            <li>
+                                <a href="{{ url_for('transactions.mark_paid', id=t.id) }}" class="btn btn-sm btn-me btn-outline-success text-success">
+                                    <i class="bi bi-check-circle"></i> Mark Paid
+                                </a>
+                            </li>
                             {% endif %}
                         </ul>
                     </div>
@@ -99,7 +100,7 @@
 function deleteTransaction(id) {
     if (confirm('Delete this transaction?')) {
         loading.show();
-        apiRequest(`/transactions/${id}/delete`, { method: 'POST' })
+        apiRequest(`/api/transactions/${id}`, { method: 'DELETE' })
             .then(() => window.location.reload())
             .catch(err => { alert('Failed: ' + err.message); loading.hide(); });
     }

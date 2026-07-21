@@ -5,17 +5,32 @@
     <div class="col-md-6 col-lg-5">
         <div class="card shadow">
             <div class="card-body">
-                <h3 class="card-title" style="color: var(--theme-80);">{{ 'Edit' if transaction else 'New' }} Transaction</h3>
-                <form method="POST" action="{{ url_for('transactions.add_transaction') if not transaction else url_for('transactions.edit_transaction', id=transaction.id) }}"  data-redirect="{{ url_for('transactions.list_transactions') }}" id="transactionForm">
+                <h3 class="card-title" style="color: var(--theme-80);">
+                    <i class="bi bi-{{ 'pencil' if transaction else 'plus-circle' }} me-2"></i>
+                    {{ 'Edit' if transaction else 'New' }} Transaction
+                </h3>
+                <form method="POST" action="{{ url_for('transactions.add_transaction') if not transaction else url_for('transactions.edit_transaction', id=transaction.id) }}" data-redirect="{{ url_for('transactions.list_transactions') }}" id="transactionForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label for="person_id" class="form-label">Person *</label>
                         <select class="form-select" id="person_id" name="person_id" required>
                             <option value="">-- Choose --</option>
                             {% for p in people %}
                             <option value="{{ p.id }}" {{ 'selected' if (transaction and transaction.person_id == p.id) or (request.args.person_id == p.id|string) }}>
-                                {{ p.name }} ({{ p.type.value }})
+                                {{ p.name }}
                             </option>
                             {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="direction" class="form-label">Direction</label>
+                        <select class="form-select" id="direction" name="direction" required>
+                            <option value="money_out" {{ 'selected' if (transaction and transaction.direction.value == 'money_out') else '' }}>
+                                I paid them (money out)
+                            </option>
+                            <option value="money_in" {{ 'selected' if (transaction and transaction.direction.value == 'money_in') else '' }}>
+                                They paid me (money in)
+                            </option>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -39,8 +54,16 @@
                         <textarea class="form-control" id="description" name="description" rows="2">{{ transaction.description if transaction else '' }}</textarea>
                     </div>
                     <div class="mb-3">
+                        <label for="made_on" class="form-label">Transaction Date</label>
+                        <input type="date" class="form-control" id="made_on" name="made_on" value="{{ transaction.made_on.strftime('%Y-%m-%d') if transaction and transaction.made_on else '' }}">
+                    </div>
+                    <div class="mb-3">
                         <label for="due_date" class="form-label">Due Date</label>
                         <input type="date" class="form-control" id="due_date" name="due_date" value="{{ transaction.due_date.strftime('%Y-%m-%d') if transaction and transaction.due_date else '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="created_at" class="form-label">Recorded At</label>
+                        <input type="datetime-local" class="form-control" id="created_at" name="created_at" value="{{ transaction.created_at.strftime('%Y-%m-%dT%H:%M') if transaction and transaction.created_at else '' }}">
                     </div>
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="is_paid" name="is_paid" {{ 'checked' if transaction and transaction.is_paid }}>
@@ -49,14 +72,14 @@
                     <div class="d-flex justify-content-between">
                         <a href="{{ url_for('transactions.list_transactions') }}" class="btn btn-outline-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary" style="background-color: var(--theme-75); border-color: var(--theme-70);">
-                        	<i class="bi bi-check-lg me-1"></i>
+                            <i class="bi bi-check-lg me-1"></i>
                             {{ 'Update' if transaction else 'Save' }}
                         </button>
                     </div>
                 </form>
-				<script>
-					handleOfflineForm(document.getElementById('transactionForm'), '/api/transaction', 'POST');
-				</script>
+                <script>
+                    handleOfflineForm(document.getElementById('transactionForm'), '/api/transactions', 'POST');
+                </script>
             </div>
         </div>
     </div>

@@ -4,60 +4,51 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 style="color: var(--theme-70);">Dashboard</h2>
     <div>
-        <a href="{{ url_for('people.list_people') }}" class="btn btn-outline-primary me-2" style="border-color: var(--theme-60); color: var(--theme-70);">People</a>
-        <a href="{{ url_for('transactions.list_transactions') }}" class="btn btn-outline-primary" style="border-color: var(--theme-60); color: var(--theme-70);">Transactions</a>
+        <a href="{{ url_for('people.list_people') }}" class="btn btn-outline-primary me-2" style="border-color: var(--theme-60); color: var(--theme-70);">
+            <i class="bi bi-people-fill me-1"></i> People
+        </a>
+        <a href="{{ url_for('transactions.list_transactions') }}" class="btn btn-outline-primary" style="border-color: var(--theme-60); color: var(--theme-70);">
+            <i class="bi bi-cash-stack me-1"></i> Transactions
+        </a>
     </div>
 </div>
 
 <div class="row g-4">
-    <!-- Cards -->
-    <div class="col-md-6 col-lg-3">
-    <div class="card text-white" style="background: linear-gradient(135deg, var(--theme-80), var(--theme-60));">
-        <div class="card-body">
-        	<span class="icon-text">
-            	<i class="bi bi-wallet2 display-5 mb-3"></i>
-            	<h5 class="card-title">Total Owed to Me</h5>
-            </span>
-            <p class="fs-4 fw-bold">{{ summary.total_owed_to_me | rwf }}</p>
+    <div class="col-md-6 col-lg-4">
+        <div class="card text-white" style="background: linear-gradient(135deg, var(--theme-80), var(--theme-60));">
+            <div class="card-body">
+                <span class="icon-text">
+                    <i class="bi bi-wallet2 display-5 mb-3"></i>
+                    <h5 class="card-title">Total Owed to Me</h5>
+                </span>
+                <p class="fs-4 fw-bold">{{ summary.total_owed_to_me | rwf }}</p>
+            </div>
         </div>
     </div>
-</div>
-<div class="col-md-6 col-lg-3">
-    <div class="card text-white" style="background: linear-gradient(135deg, var(--theme-90), var(--theme-70));">
-        <div class="card-body">
-        	<span class="icon-text">
-            	<i class="bi bi-cash-coin display-5 mb-3"></i>
-            	<h5 class="card-title">Total I Owe</h5>
-            </span>
-            <p class="fs-4 fw-bold">{{ summary.total_i_owe | rwf }}</p>
+    <div class="col-md-6 col-lg-4">
+        <div class="card text-white" style="background: linear-gradient(135deg, var(--theme-90), var(--theme-70));">
+            <div class="card-body">
+                <span class="icon-text">
+                    <i class="bi bi-cash-coin display-5 mb-3"></i>
+                    <h5 class="card-title">Total I Owe</h5>
+                </span>
+                <p class="fs-4 fw-bold">{{ summary.total_i_owe | rwf }}</p>
+            </div>
         </div>
     </div>
-</div>
-<div class="col-md-6 col-lg-3">
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
-        	<span class="icon-text">
-            	<i class="bi bi-people display-5 mb-3" style="color: var(--theme-70);"></i>
-            	<h5 class="card-title">Debtors</h5>
-            </span>
-            <p class="fs-4">{{ summary.debtor_count }}</p>
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <span class="icon-text">
+                    <i class="bi bi-people display-5 mb-3" style="color: var(--theme-70);"></i>
+                    <h5 class="card-title">People</h5>
+                </span>
+                <p class="fs-4">{{ summary.people_count }}</p>
+            </div>
         </div>
     </div>
-</div>
-<div class="col-md-6 col-lg-3">
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
-            <span class="icon-text">
-            	<i class="bi bi-person-lines-fill display-5 mb-3" style="color: var(--theme-70);"></i>
-            	<h5 class="card-title">Creditors</h5>
-            </span>
-            <p class="fs-4">{{ summary.creditor_count }}</p>
-        </div>
-    </div>
-</div>
 </div>
 
-<!-- Recent Transactions -->
 <div class="card mt-5 shadow-sm">
     <div class="card-header" style="background-color: var(--theme-20); color: var(--theme-90);">
         Recent Transactions
@@ -69,6 +60,7 @@
                 <thead>
                     <tr>
                         <th>Person</th>
+                        <th>Direction</th>
                         <th>Amount</th>
                         <th>Status</th>
                         <th>Date</th>
@@ -78,11 +70,18 @@
                     {% for t in recent_transactions %}
                     <tr>
                         <td>
-                			<a href="{{ url_for('people.person_detail', id=t.person.id) }}" class="text-decoration-none" style="color: var(--theme-80);">
-        						{{ t.person.name }}
-    						</a>
-                    	</td>
-                        <td>{{ t.amount | rwf }}</td>
+                            <a href="{{ url_for('people.person_detail', id=t.person.id) }}" class="text-decoration-none" style="color: var(--theme-80);">
+                                {{ t.person.name }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if t.direction.value == 'money_out' %}
+                                <span class="badge bg-danger">You paid</span>
+                            {% else %}
+                                <span class="badge bg-success">They paid</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ t.total_due | rwf }}</td>
                         <td>
                             {% if t.is_paid %}
                                 <span class="badge bg-success">Paid</span>

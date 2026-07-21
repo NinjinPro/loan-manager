@@ -1,6 +1,5 @@
-# crud/transaction_crud.py
 from crud.base import BaseCRUD
-from models.transaction import Transaction
+from models.transaction import Transaction, MoneyDirection
 from db.database import db
 from sqlalchemy import select, desc
 from datetime import datetime
@@ -24,3 +23,17 @@ class TransactionCRUD(BaseCRUD[Transaction]):
             trans.is_paid = True
             trans.paid_date = datetime.utcnow()
             db.session.commit()
+
+    def get_person_balance(self, person_id: int):
+        transactions = db.session.scalars(
+            select(Transaction).where(Transaction.person_id == person_id)
+        ).all()
+        you_owe = sum(t.total_due or 0 for t in transactions
+                      if t.direction == MoneyDirection.MONEY_OUT and not t.is_paid)
+        they_owe = sum(t.total_due or 0 for t in transactions
+                       if t.direction == MoneyDirection.MONEY_IN and not t.is_paid)
+        return {
+            "you_owe": you_owe,
+            "they_owe": they_owe,
+            "net": they_owe - you_owe
+        }

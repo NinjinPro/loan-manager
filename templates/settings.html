@@ -7,6 +7,7 @@
             <div class="card-body">
                 <h3 class="card-title" style="color: var(--theme-80);">Theme Colour</h3>
                 <form method="POST" action="{{ url_for('settings.theme') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label for="mainColorPicker" class="form-label">Main UI Colour</label>
                         <input type="color" class="form-control form-control-color w-100" id="mainColorPicker" name="main_color" value="{{ current_color }}">
