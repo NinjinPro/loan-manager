@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if transaction else 'Add' }} Transaction{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-body">
+                <h3 class="card-title" style="color: var(--theme-80);">{{ 'Edit' if transaction else 'New' }} Transaction</h3>
+                <form method="POST" action="{{ url_for('transactions.add_transaction') if not transaction else url_for('transactions.edit_transaction', id=transaction.id) }}"  data-redirect="{{ url_for('transactions.list_transactions') }}" id="transactionForm">
+                    <div class="mb-3">
+                        <label for="person_id" class="form-label">Person *</label>
+                        <select class="form-select" id="person_id" name="person_id" required>
+                            <option value="">-- Choose --</option>
+                            {% for p in people %}
+                            <option value="{{ p.id }}" {{ 'selected' if (transaction and transaction.person_id == p.id) or (request.args.person_id == p.id|string) }}>
+                                {{ p.name }} ({{ p.type.value }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount (Rwf) *</label>
+                        <input type="number" step="0.01" class="form-control" id="amount" name="amount" value="{{ transaction.amount if transaction else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="interest_rate" class="form-label">Interest Rate (%) <small class="text-muted">optional</small></label>
+                        <input type="number" step="0.01" class="form-control" id="interest_rate" name="interest_rate" value="{{ transaction.interest_rate if transaction else '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="interest_amount" class="form-label">Interest Amount (Rwf) <small class="text-muted">auto-calc if rate given</small></label>
+                        <input type="number" step="0.01" class="form-control" id="interest_amount" name="interest_amount" value="{{ transaction.interest_amount if transaction else '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="total_due" class="form-label">Total Due (Rwf) <small class="text-muted">amount + interest</small></label>
+                        <input type="number" step="0.01" class="form-control" id="total_due" name="total_due" value="{{ transaction.total_due if transaction else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="2">{{ transaction.description if transaction else '' }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="due_date" class="form-label">Due Date</label>
+                        <input type="date" class="form-control" id="due_date" name="due_date" value="{{ transaction.due_date.strftime('%Y-%m-%d') if transaction and transaction.due_date else '' }}">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_paid" name="is_paid" {{ 'checked' if transaction and transaction.is_paid }}>
+                        <label class="form-check-label" for="is_paid">Mark as Paid</label>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('transactions.list_transactions') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary" style="background-color: var(--theme-75); border-color: var(--theme-70);">
+                        	<i class="bi bi-check-lg me-1"></i>
+                            {{ 'Update' if transaction else 'Save' }}
+                        </button>
+                    </div>
+                </form>
+				<script>
+					handleOfflineForm(document.getElementById('transactionForm'), '/api/transaction', 'POST');
+				</script>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

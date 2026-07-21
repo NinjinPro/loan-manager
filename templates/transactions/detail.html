@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Transaction #{{ transaction.id }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 style="color: var(--theme-70);">Transaction #{{ transaction.id }}</h2>
+    <a href="{{ url_for('transactions.list_transactions') }}" class="btn btn-outline-secondary btn-sm">← Back to List</a>
+</div>
+
+<div class="row g-4">
+    <!-- Summary Card -->
+    <div class="col-md-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">📋 Summary</h5>
+                <table class="table table-borderless mb-0">
+                    <tr>
+                        <th>Person</th>
+                        <td>{{ transaction.person.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Amount</th>
+                        <td>{{ transaction.amount | rwf }}</td>
+                    </tr>
+                    <tr>
+                        <th>Interest Rate</th>
+                        <td>{{ transaction.interest_rate or '—' }}%</td>
+                    </tr>
+                    <tr>
+                        <th>Interest Amount</th>
+                        <td>{{ (transaction.interest_amount or 0) | rwf }}</td>
+                    </tr>
+                    <tr>
+                        <th>Total Due</th>
+                        <td class="fw-bold">{{ (transaction.total_due or 0) | rwf }}</td>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <td>
+                            {% if transaction.is_paid %}
+                                <span class="badge bg-success">Paid</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Recorded</th>
+                        <td>{{ transaction.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Due Date</th>
+                        <td>{{ transaction.due_date.strftime('%d/%m/%Y') if transaction.due_date else '—' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Paid Date</th>
+                        <td>{{ transaction.paid_date.strftime('%d/%m/%Y %H:%M') if transaction.paid_date else '—' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td>{{ transaction.description or '—' }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Form Section -->
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: var(--theme-20);">
+                <span style="color: var(--theme-90);">✏️ Edit Transaction</span>
+                <button class="btn btn-sm btn-outline-primary" id="toggleEditBtn" style="border-color: var(--theme-60); color: var(--theme-70);">
+                    Show Form
+                </button>
+            </div>
+            <div class="card-body" id="editFormContainer" style="display: none;">
+                <form method="POST" action="{{ url_for('transactions.detail', id=transaction.id) }}">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label for="person_id" class="form-label">Person</label>
+                            <select class="form-select" id="person_id" name="person_id" required>
+                                {% for p in people %}
+                                <option value="{{ p.id }}" {% if p.id == transaction.person_id %}selected{% endif %}>
+                                    {{ p.name }} ({{ p.type.value }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="amount" class="form-label">Amount (Rwf)</label>
+                            <input type="number" step="0.01" class="form-control" id="amount" name="amount" value="{{ transaction.amount }}" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="interest_rate" class="form-label">Int. Rate %</label>
+                            <input type="number" step="0.01" class="form-control" id="interest_rate" name="interest_rate" value="{{ transaction.interest_rate or '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="interest_amount" class="form-label">Int. Amount (Rwf)</label>
+                            <input type="number" step="0.01" class="form-control" id="interest_amount" name="interest_amount" value="{{ transaction.interest_amount or '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="total_due" class="form-label">Total Due (Rwf)</label>
+                            <input type="number" step="0.01" class="form-control" id="total_due" name="total_due" value="{{ transaction.total_due }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="description" class="form-label">Description</label>
+                            <input type="text" class="form-control" id="description" name="description" value="{{ transaction.description or '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="due_date" class="form-label">Due Date</label>
+                            <input type="date" class="form-control" id="due_date" name="due_date" value="{{ transaction.due_date.strftime('%Y-%m-%d') if transaction.due_date else '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="created_at" class="form-label">Recorded At</label>
+                            <input type="datetime-local" class="form-control" id="created_at" name="created_at" value="{{ format_datetime(transaction.created_at) }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="paid_date" class="form-label">Paid Date</label>
+                            <input type="datetime-local" class="form-control" id="paid_date" name="paid_date" value="{{ format_datetime(transaction.paid_date) }}">
+                        </div>
+                        <div class="col-12 form-check mt-3">
+                            <input type="checkbox" class="form-check-input" id="is_paid" name="is_paid" {% if transaction.is_paid %}checked{% endif %}>
+                            <label class="form-check-label" for="is_paid">Mark as Paid</label>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <a href="{{ url_for('transactions.list_transactions') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary" style="background-color: var(--theme-75); border-color: var(--theme-70);">
+                            Update Transaction
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('toggleEditBtn');
+        const formContainer = document.getElementById('editFormContainer');
+        let formVisible = false;
+
+        toggleBtn.addEventListener('click', function() {
+            formVisible = !formVisible;
+            formContainer.style.display = formVisible ? 'block' : 'none';
+            toggleBtn.textContent = formVisible ? 'Hide Form' : 'Show Form';
+        });
+    });
+</script>
+{% endblock %}

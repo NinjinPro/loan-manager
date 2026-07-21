@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}People{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 style="color: var(--theme-70);">People</h2>
+    <a href="{{ url_for('people.add_person') }}" class="btn btn-primary">
+    	<i class="bi bi-plus-circle me-1"></i> Add Person
+	</a>
+</div>
+
+<ul class="nav nav-tabs mb-3" id="peopleTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="debtors-tab" data-bs-toggle="tab" data-bs-target="#debtors" type="button" role="tab">Debtors ({{ debtors | length }})</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="creditors-tab" data-bs-toggle="tab" data-bs-target="#creditors" type="button" role="tab">Creditors ({{ creditors | length }})</button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- Debtors -->
+    <div class="tab-pane fade show active" id="debtors" role="tabpanel">
+        {% if debtors %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+            {% for person in debtors %}
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+    						<a href="{{ url_for('people.person_detail', id=person.id) }}" class="text-decoration-none" style="color: var(--theme-80);">
+        						{{ person.name }}
+    						</a>
+						</h5>
+                        <p class="card-text text-muted">{{ person.phone or 'No phone' }}</p>
+                        <p class="text-muted small">{{ person.notes or '' }}</p>
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('people.edit_person', id=person.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <a href="{{ url_for('transactions.list_transactions', person_id=person.id) }}" class="btn btn-sm btn-outline-primary">Transactions</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted">No debtors yet.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Creditors -->
+    <div class="tab-pane fade" id="creditors" role="tabpanel">
+        {% if creditors %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+            {% for person in creditors %}
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+    						<a href="{{ url_for('people.person_detail', id=person.id) }}" class="text-decoration-none" style="color: var(--theme-80);">
+        						{{ person.name }}
+    						</a>
+						</h5>
+                        <p class="card-text text-muted">{{ person.phone or 'No phone' }}</p>
+                        <p class="text-muted small">{{ person.notes or '' }}</p>
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('people.edit_person', id=person.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <a href="{{ url_for('transactions.list_transactions', person_id=person.id) }}" class="btn btn-sm btn-outline-primary">Transactions</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted">No creditors yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

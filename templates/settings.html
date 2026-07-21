@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-body">
+                <h3 class="card-title" style="color: var(--theme-80);">Theme Colour</h3>
+                <form method="POST" action="{{ url_for('settings.theme') }}">
+                    <div class="mb-3">
+                        <label for="mainColorPicker" class="form-label">Main UI Colour</label>
+                        <input type="color" class="form-control form-control-color w-100" id="mainColorPicker" name="main_color" value="{{ current_color }}">
+                    </div>
+                    <div id="colorPreview" class="mb-3 d-flex flex-wrap gap-1">colorPreview</div>
+                    <button type="submit" class="btn btn-primary w-100" style="background-color: var(--theme-75); border-color: var(--theme-70);">
+                        Save Theme
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/components/settings.js') }}"></script>
+<script>
+    // On page load, preview the current colour
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.theme) {
+            window.theme.previewColor('{{ current_color }}');
+        }
+    });
+</script>
+{% endblock %}

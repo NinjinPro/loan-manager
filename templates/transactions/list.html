@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Transactions{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 style="color: var(--theme-70);">Transactions{% if person %} with {{ person.name }}{% endif %}</h2>
+    <a href="{{ url_for('transactions.add_transaction') }}{% if person %}?person_id={{ person.id }}{% endif %}" class="btn btn-primary" style="background-color: var(--theme-75); border-color: var(--theme-70);">
+        <i class="bi bi-plus-circle me-1"></i> New Transaction
+    </a>
+</div>
+
+<!-- Filters -->
+<form class="row g-2 mb-3" method="GET">
+    <div class="col-md-3">
+        <select name="status" class="form-select">
+            <option value="all" {{ 'selected' if status == 'all' }}>All</option>
+            <option value="pending" {{ 'selected' if status == 'pending' }}>Pending</option>
+            <option value="paid" {{ 'selected' if status == 'paid' }}>Paid</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-outline-primary w-100">Filter</button>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Person</th>
+                <th>Amount</th>
+                <th>Interest</th>
+                <th>Total Due</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in transactions %}
+            <tr>
+                <td>
+                	<a href="{{ url_for('people.person_detail', id=t.person.id) }}" class="text-decoration-none" style="color: var(--theme-80);">
+        				{{ t.person.name }}
+    				</a>
+                </td>
+                
+                <td>{{ t.amount | rwf }}</td>
+                <td>{{ (t.interest_amount or 0) | rwf }}</td>
+                <td>{{ (t.total_due or 0) | rwf }}</td>
+                <td>
+                    <span class="badge {{ 'bg-success' if t.is_paid else 'bg-warning text-dark' }}">
+                        {{ 'Paid' if t.is_paid else 'Pending' }}
+                    </span>
+                </td>
+                <td>{{ t.created_at.strftime('%d/%m/%Y') }}</td>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            Actions
+                        </button>
+                        <ul class="dropdown-menu">
+                        	<li>
+                            	<a href="{{ url_for('transactions.detail', id=t.id) }}" class="btn-me btn-outline btn btn-sm">
+    								<i class="bi bi-eye-fill"></i> View
+								</a>
+							</li>
+                            
+                            <li>
+                            	<a href="{{ url_for('transactions.edit_transaction', id=t.id) }}" class="btn-me btn-outline-primary btn btn-sm">
+                            		<i class="bi bi-pencil-square"></i> Edit
+                            	</a>
+                            </li>
+                            
+                            <li>
+                            	<a href="#" onclick="deleteTransaction({{ t.id }})" class="btn-me btn btn-sm btn-outline-danger">
+    								<i class="bi bi-trash3-fill"></i> Delete
+								</a>
+                            </li>
+                            
+                            {% if not t.is_paid %}
+                            	<li>
+                                	<a href="{{ url_for('transactions.mark_paid', id=t.id) }}" class="btn btn-sm btn-me btn-outline-success text-success">
+                                		Mark Paid
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" class="text-center text-muted">No transactions found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function deleteTransaction(id) {
+    if (confirm('Delete this transaction?')) {
+        loading.show();
+        apiRequest(`/transactions/${id}/delete`, { method: 'POST' })
+            .then(() => window.location.reload())
+            .catch(err => { alert('Failed: ' + err.message); loading.hide(); });
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow" style="border-top: 4px solid var(--theme-45); border-top-right-radius: 0; border-top-left-radius: 0;">
+            <div class="card-body p-4">
+                <h3 class="card-title text-center mb-4" style="color: var(--theme-40);">Create Account</h3>
+                <form method="POST" action="{{ url_for('auth.register') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" style="background-color: var(--theme-45); border-color: var(--theme-70);">
+                        Register
+                    </button>
+                </form>
+                <div class="mt-3 text-center">
+                    <small>Already registered? <a href="{{ url_for('auth.login') }}" style="color: var(--theme-45);">Login</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Details – {{ person.name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 style="color: var(--theme-70);">{{ person.name }}</h2>
+    <div>
+        <a href="{{ url_for('people.edit_person', id=person.id) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+        <a href="{{ url_for('transactions.list_transactions', person_id=person.id) }}" class="btn btn-outline-primary btn-sm">View Transactions</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Person Info Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">👤 Person Info</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Name:</strong> {{ person.name }}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Phone:</strong> {{ person.phone or 'N/A' }}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Type:</strong>
+                        <span class="badge bg-{{ 'warning' if person.type.value == 'debtor' else 'info' }}">
+                            {{ person.type.value.capitalize() }}
+                        </span>
+                    </li>
+                    {% if person.notes %}
+                    <li class="list-group-item">
+                        <strong>Notes:</strong><br> {{ person.notes }}
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Totals Card -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <h5 class="card-title">💰 Summary</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Pending:</span>
+                        <span class="fw-bold text-danger">{{ total_pending | rwf }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Paid:</span>
+                        <span class="fw-bold text-success">{{ total_paid | rwf }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Total:</span>
+                        <span class="fw-bold">{{ total_all | rwf }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transactions List -->
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: var(--theme-20);">
+                <span style="color: var(--theme-90);">📋 Transactions</span>
+                <a href="{{ url_for('transactions.add_transaction', person_id=person.id) }}" class="btn btn-sm btn-primary" style="background-color: var(--theme-75); border-color: var(--theme-70);">
+                    + New Transaction
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if transactions %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Amount</th>
+                                <th>Interest</th>
+                                <th>Total Due</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in transactions %}
+                            <tr class="{{ 'table-success' if t.is_paid else '' }}">
+                                <td>{{ t.amount | rwf }}</td>
+                                <td>{{ (t.interest_amount or 0) | rwf }}</td>
+                                <td>{{ (t.total_due or 0) | rwf }}</td>
+                                <td>
+                                    {% if t.is_paid %}
+                                        <span class="badge bg-success">Paid</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ t.created_at.strftime('%d/%m/%Y') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted my-4">No transactions yet for this person.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<a href="{{ url_for('people.list_people') }}" class="btn btn-outline-secondary mt-3">← Back to People</a>
+{% endblock %}
