@@ -5,6 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
+import os
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -27,13 +29,15 @@ target_metadata = Base.metadata
 # ... etc.
 
 from dotenv import load_dotenv
-load_dotenv()
-url = os.getenv("DATABASE_URI", None)
+import os
 
+load_dotenv()
+
+url = os.getenv("DATABASE_URI")
 if not url:
-    raise ValueError("Loading DATABASE_URI from .env didn't work")
-    
-context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
+    raise ValueError("DATABASE_URI not found")
+
+config.set_main_option("sqlalchemy.url", url)
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
