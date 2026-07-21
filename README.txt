@@ -1,7 +1,7 @@
 # Project Structure
 
 loan-manager/
-├── README.md
+├── README.txt
 ├── alembic.ini
 ├── requirements.txt
 ├── run.py
@@ -267,7 +267,7 @@ This project is licensed under the MIT License.
 Name: NIYIGENA Gracieux
 GitHub: https://github.com/ninjinpro
 LinkedIn: https://linkedin.com/in/niyigena-gracieux
-EmailYo: gracieuxdevelop@gmail.com
+Email: gracieuxdevelop@gmail.com
 
 ---
 
