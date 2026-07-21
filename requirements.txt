@@ -4,3 +4,5 @@ itsdangerous==2.2.0
 Jinja2==3.1.6
 SQLAlchemy==2.0.51
 Werkzeug==3.1.8
+alembic==1.18.5
+python-dotenv==1.2.2
