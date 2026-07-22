@@ -86,40 +86,23 @@ loan-manager/
 
 # Installation
 
-Clone the repository.
-	git clone https://github.com/ninjinpro/loan-manager.git
-
-Navigate into the project.
-	cd loan-manager
-
-Create a virtual environment.
-	python -m venv venv
-
-Activate it.
+1. Clone the repository. `git clone https://github.com/ninjinpro/loan-manager.git`
+2. Navigate into the project. `cd loan-manager`
+3. Create a virtual environment. `python -m venv venv`
+4. Activate it:
 	- Linux/macOS: ```source venv/bin/activate```
 	- Windows: ```venv\Scripts\activate```
-
-Install dependencies.
-	```pip install -r requirements.txt```
-
-Create your ".env" file.
+5. Install dependencies. ```pip install -r requirements.txt```
+6. Create your ".env" file.
 ```
 SECRET_KEY=your-secret-key
 DATABASE_URI=sqlite:///loan_manager.db
 DEBUG=True
 ```
 
-Run database migrations.
-
-```alembic upgrade head```
-
-Start the application.
-
-```python run.py```
-
-Open your browser.
-
-```http://localhost:8080```
+7. Run database migrations. ```alembic upgrade head```
+8. Start the application. ```python run.py```
+9. Open your browser. ```http://localhost:8080```
 
 ---
 
@@ -209,7 +192,7 @@ General deployment steps:
 
 ## Deployed Live Details
 
-1. Link: [link](`https://ninjinpro.pythonanywhere.com/`)
+1. Link: [link](https://ninjinpro.pythonanywhere.com/)
 2. Login credintials:
     - username: `user`
     - password: `user@123`
