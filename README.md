@@ -2,43 +2,41 @@
 
 # Project Structure
 
+```
 loan-manager/
-├── README.txt
+├── README.md
 ├── alembic.ini
 ├── requirements.txt
 ├── run.py
-├── alembic
+├── alembic/
 │   ├── README
 │   ├── env.py
 │   ├── script.py.mako
-│   └── versions
-│       ├── 08d486f065b1_initial_migration.py
-│       └── __pycache__
-│           └── f86cd22432d0_v2_initial_migration.cpython-314.pyc
-├── app
+│   └── versions/
+├── app/
 │   ├── __init__.py
 │   ├── config.py
 │   ├── notifications.py
 │   └── theme.py
-├── crud
+├── crud/
 │   ├── __init__.py
 │   ├── base.py
 │   ├── notification.py
 │   ├── person.py
 │   ├── transaction.py
 │   └── user.py
-├── db
+├── db/
 │   ├── __init__.py
 │   └── database.py
-├── instance
+├── instance/
 │   └── loan_manager.db
-├── models
+├── models/
 │   ├── __init__.py
 │   ├── notification.py
 │   ├── person.py
 │   ├── transaction.py
 │   └── user.py
-├── routes
+├── routes/
 │   ├── __init__.py
 │   ├── api.py
 │   ├── auth.py
@@ -47,37 +45,36 @@ loan-manager/
 │   ├── person.py
 │   ├── settings.py
 │   └── transactions.py
-├── static
-│   ├── css
+├── static/
+│   ├── css/
 │   │   └── main.css
-│   └── js
+│   └── js/
 │       ├── LoadingIndicator.js
 │       ├── NotificationManager.js
 │       ├── SyncManager.js
 │       ├── ThemeManager.js
 │       ├── app.js
-│       ├── components
-│       │   └── settings.js
 │       ├── db.js
 │       └── utils.js
-└── templates
-    ├── auth
+└── templates/
+    ├── auth/
     │   ├── login.html
     │   └── register.html
     ├── base.html
-    ├── components
+    ├── components/
     │   ├── loading.html
     │   └── notifications_container.html
     ├── dashboard.html
-    ├── people
+    ├── people/
     │   ├── detail.html
     │   ├── form.html
     │   └── list.html
     ├── settings.html
-    └── transactions
+    └── transactions/
         ├── detail.html
         ├── form.html
         └── list.html
+```
 
 ---
 
@@ -266,10 +263,10 @@ This project is licensed under the MIT License.
 
 # Author
 
-Name: NIYIGENA Gracieux
-GitHub: https://github.com/ninjinpro
-LinkedIn: https://linkedin.com/in/niyigena-gracieux
-Email: gracieuxdevelop@gmail.com
+- Name: NIYIGENA Gracieux
+- GitHub: https://github.com/ninjinpro
+- LinkedIn: https://linkedin.com/in/niyigena-gracieux
+- Email: gracieuxdevelop@gmail.com
 
 ---
 
