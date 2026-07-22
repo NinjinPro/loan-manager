@@ -207,6 +207,13 @@ General deployment steps:
 3. Run database migrations.
 4. Start the application using Gunicorn.
 
+## Deployed Live Details
+
+1. Link: [link](`https://ninjinpro.pythonanywhere.com/`)
+2. Login credintials:
+    - username: `user`
+    - password: `user@123`
+
 ---
 
 # Roadmap
@@ -264,9 +271,9 @@ This project is licensed under the MIT License.
 # Author
 
 - Name: NIYIGENA Gracieux
-- GitHub: https://github.com/ninjinpro
-- LinkedIn: https://linkedin.com/in/niyigena-gracieux
-- Email: gracieuxdevelop@gmail.com
+- GitHub: [@ninjinpro](https://github.com/ninjinpro)
+- LinkedIn: [niyigena-gracieux](https://linkedin.com/in/niyigena-gracieux)
+- Email: [gracieuxdevelop@gmail.com](mailto:gracieuxdevelop@gmail.com)
 
 ---
 
